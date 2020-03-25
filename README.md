@@ -24,9 +24,9 @@ Then, for each block, 20 MFCCs are extracted to form a 20 * 63 input matrix and 
 
 SVM detection using MFCC feature only-
 
-1. Max Accuracy Score of Vowel 'a' is - 69.59% with 12.0 Coefficients
-2. Max Accuracy Score of Vowel 'i' is - 89.18% with 12.0 Coefficients
-3. Max Accuracy Score of Vowel 'u' is - 94.43% with 18.0 Coefficients
+1. Max Accuracy Score of Vowel 'a' is - 69.59% with 12 Coefficients
+2. Max Accuracy Score of Vowel 'i' is - 89.18% with 12 Coefficients
+3. Max Accuracy Score of Vowel 'u' is - 94.43% with 18 Coefficients
 
 SVM detection using all global scalars features-
 

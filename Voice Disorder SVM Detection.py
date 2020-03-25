@@ -16,6 +16,8 @@ from python_speech_features import mfcc
 from sklearn import preprocessing
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, accuracy_score
+import pickle as pkl
+from FeatureExtractionFunction import main_get_feature
 
 
 # Dataset - http://stimmdb.coli.uni-saarland.de/index.php4#target 
@@ -91,81 +93,163 @@ def get_mfcc_features(samples_dict, numCep):
 
 def read_samples(my_dir):
     print("Preprocessing negative samples...")
-    negative_samples = preprocess_wav_files(my_dir + '/negative_samples')
+    neg_train = preprocess_wav_files(my_dir + '/train_neg')
+    neg_test = preprocess_wav_files(my_dir + '/test_neg')
     print("Preprocessing positive samples...")
-    positive_samples = preprocess_wav_files(my_dir + '/positive_samples')
-    del negative_samples['iau'] # deleting unused key - samples of all vowels together ('iau')
-    return negative_samples, positive_samples
+    pos_train = preprocess_wav_files(my_dir + '/train_pos')
+    pos_test = preprocess_wav_files(my_dir + '/test_pos')
+    del neg_train['iau'] # deleting unused key - samples of all vowels together ('iau')
+    del neg_test['iau'] # deleting unused key - samples of all vowels together ('iau')
+    return neg_train, neg_test, pos_train, pos_test
     
-def get_vowels_dataset(negative_samples, positive_samples, numcep=20, test_ratio=0.2):
+def get_vowels_dataset(neg_train, neg_test, pos_train, pos_test, numcep=20):
+    # test_ratio = 20%
     print("Extracting negative mfcc features...")
-    mfcc_negative = get_mfcc_features(negative_samples, numcep)
+    mfcc_negative_train = get_mfcc_features(neg_train, numcep)
+    mfcc_negative_test = get_mfcc_features(neg_test, numcep)
     print("Extracting positive mfcc features...")
-    mfcc_positive = get_mfcc_features(positive_samples, numcep)
+    mfcc_positive_train = get_mfcc_features(pos_train, numcep)
+    mfcc_positive_test = get_mfcc_features(pos_test, numcep)
     vowels_dataset = defaultdict(list)
     print("Building dataset for each vowel...")
-    for key in mfcc_negative.keys():
-        v_neg = np.zeros((len(mfcc_negative[key]),1))
-        v_pos = np.ones((len(mfcc_positive[key]),1))
-        v_neg = np.concatenate((mfcc_negative[key], v_neg), axis=1)
-        v_pos = np.concatenate((mfcc_positive[key], v_pos), axis=1)
-        dataset = np.concatenate((v_neg, v_pos))
-        np.random.shuffle(dataset)
-        train_data = dataset[:int(len(dataset)*(1-test_ratio))] 
-        test_data = dataset[int(len(dataset)*(1-test_ratio)):] 
+    for key in mfcc_negative_train.keys():
+        # Train data
+        v_neg = np.zeros((len(mfcc_negative_train[key]),1))
+        v_pos = np.ones((len(mfcc_positive_train[key]),1))
+        v_neg = np.concatenate((mfcc_negative_train[key], v_neg), axis=1)
+        v_pos = np.concatenate((mfcc_positive_train[key], v_pos), axis=1)
+        train_data = np.concatenate((v_neg, v_pos))
+        np.random.shuffle(train_data)
+        # Test data
+        v_neg = np.zeros((len(mfcc_negative_test[key]),1))
+        v_pos = np.ones((len(mfcc_positive_test[key]),1))
+        v_neg = np.concatenate((mfcc_negative_test[key], v_neg), axis=1)
+        v_pos = np.concatenate((mfcc_positive_test[key], v_pos), axis=1)
+        test_data = np.concatenate((v_neg, v_pos))
+        np.random.shuffle(test_data)
         vowels_dataset[key] = [train_data, test_data]
     return vowels_dataset
 
 def SVM_test(dataset):
     print("Train and test linear SVM on each vowel...")
-    accList = []
+    accList, farList = [], []
     for key in dataset.keys():
-        # print('#'*49)
         print('#'*10 + ' '*6 + f"Vowel \'{key}\' results" + ' '*6 + '#'*10)
-        # print('#'*49)
         train, test = vowels_dataset[key]
         svclassifier = SVC(kernel='linear')
         svclassifier.fit(train[:,:-1], train[:,-1])
+        with open(f'SVM_{key}.pkl', 'wb') as fid:
+            pkl.dump(svclassifier, fid)
         y_pred = svclassifier.predict(test[:,:-1])
         # print(classification_report(test[:,-1], y_pred))
         acc = accuracy_score(test[:,-1], y_pred)
+        far = np.sum(y_pred[np.argwhere(test[:,-1]==0)])/len(np.argwhere(test[:,-1]==0))
         accList.append(acc)
-    return accList
+        farList.append(far)
+    return accList, farList
 
-def plt_SVM(numCep, accList):
-    plt.figure()
-    plt.plot(numCep, accList[:,0], '-r', label='Vowel \'a\'')
-    plt.plot(numCep, accList[:,1], '-g', label='Vowel \'i\'')
-    plt.plot(numCep, accList[:,2], '-b', label='Vowel \'u\'')
+def plt_SVM(numCep, accList, farList):
+    fig, ax1 = plt.subplots()
     plt.title("Voice Disorder SVM Detection\nAccuracy as function of Mel Frequency Cepstral Coefficient (MFCC) amount\nUsing Saarbruecken Voice Database", pad=10, weight='bold')
-    plt.xlabel("Number of Coefficients")
-    plt.ylabel("Accuracy Score")
-    plt.ylim(0.98, 1.005)
-    plt.legend()
+    ax1.plot(numCep, accList[:,0], '-r', label='Vowel \'a\' Accuracy')
+    ax1.plot(numCep, accList[:,1], '-g', label='Vowel \'i\' Accuracy')
+    ax1.plot(numCep, accList[:,2], '-b', label='Vowel \'u\' Accuracy')
+    ax1.set_xlabel("Number of Coefficients")
+    ax1.set_ylabel("Accuracy Score")    
+    # ax1.set_ylim(np.min(accList)-0.005, 1.005)
+    ax1.set_ylim(0, 1.005)
+    plt.legend(loc='upper left')
+    ax2 = ax1.twinx()
+    ax2.plot(numCep, farList[:,0], ':r', label='Vowel \'a\' Far')
+    ax2.plot(numCep, farList[:,1], ':g', label='Vowel \'i\' Far')
+    ax2.plot(numCep, farList[:,2], ':b', label='Vowel \'u\' Far')    
+    ax2.set_ylabel("False Alarms") 
+    # ax2.set_ylim(np.min(farList)-0.005, np.max(farList)+0.005)
+    ax2.set_ylim(0, 1.005)
+    fig.tight_layout()
+    plt.legend(loc='upper right')
     plt.show()
-    
+
 def test_person(my_dir, person_dir, vowels_dataset):
     vowelsDict = preprocess_wav_files(my_dir + person_dir)
     mfcc = get_mfcc_features(vowelsDict, 20)
     for key in vowels_dataset.keys():
-        train, test = vowels_dataset[key]
-        svclassifier = SVC(kernel='linear')
-        svclassifier.fit(train[:,:-1], train[:,-1])
-        y_pred = svclassifier.predict(mfcc[key])
-        acc = accuracy_score(np.zeros((len(y_pred),1)), y_pred)
-        print(f"According to Vowel \'{key}\' you are {np.round((1-acc)*100,2)} % sick")
+        if key in mfcc.keys():
+            with open(f'SVM_{key}.pkl', 'rb') as f:
+                svclassifier = pkl.load(f)
+            y_pred = svclassifier.predict(mfcc[key])
+            acc = accuracy_score(np.zeros((len(y_pred),1)), y_pred)
+            print(f"According to Vowel \'{key}\' you are {np.round((1-acc)*100,2)}% sick")
+
+def test_scalar_features(my_dir):
+    # Please note that dict from "main_get_feature" method is normalized
+    if os.path.exists(my_dir + '/features_dataset.npy'):
+        print("Loading dataset...")
+        neg_train, neg_test, pos_train, pos_test = np.load(my_dir + '/features_dataset.npy', allow_pickle=True)
+    else:
+        print("Get negative samples features...")
+        neg_train = main_get_feature(my_dir + '/train_neg')
+        neg_test = main_get_feature(my_dir + '/test_neg')
+        print("Get positive samples features...")
+        pos_train = main_get_feature(my_dir + '/train_pos')
+        pos_test = main_get_feature(my_dir + '/test_pos')
+        np.save(my_dir + '/features_dataset.npy', [neg_train, neg_test, pos_train, pos_test])
+    vowels_dataset = defaultdict(list)
+    print("Building dataset for each vowel...")
+    for key in neg_train.keys():
+        # Train data
+        v_neg = np.zeros((len(neg_train[key]),1))
+        v_pos = np.ones((len(pos_train[key]),1))
+        v_neg = np.concatenate((neg_train[key], v_neg), axis=1)
+        v_pos = np.concatenate((pos_train[key], v_pos), axis=1)
+        train_data = np.concatenate((v_neg, v_pos))
+        np.random.shuffle(train_data)
+        # Test data
+        v_neg = np.zeros((len(neg_test[key]),1))
+        v_pos = np.ones((len(pos_test[key]),1))
+        v_neg = np.concatenate((neg_test[key], v_neg), axis=1)
+        v_pos = np.concatenate((pos_test[key], v_pos), axis=1)
+        test_data = np.concatenate((v_neg, v_pos))
+        np.random.shuffle(test_data)
+        vowels_dataset[key] = [train_data, test_data]
+    return vowels_dataset
+    
 
 if __name__== '__main__':
-    my_dir = 'C:/Users/Avinoam/Desktop'
-    negative_samples, positive_samples = read_samples(my_dir)
-    numCep = np.arange(10,21,1) # Mel Frequency Cepstral Coefficient amount
-    accList = []
-    for n in numCep:  
-        print(f"Eval numcep = {n}")
-        vowels_dataset = get_vowels_dataset(negative_samples, positive_samples, numcep=n)
-        # np.save(my_dir + '/dataset.npy', vowels_dataset)
-        acc = SVM_test(vowels_dataset)
-        accList.append(acc)
-    res = np.reshape(accList, (len(numCep),3))
-    plt_SVM(numCep, res)
-    test_person(my_dir,'/oshri_voice',vowels_dataset)
+    my_dir = 'C:/Users/Avinoam/Desktop/dataset'
+    featuers = 'mfcc' # 'all'- takes all scalars global featurs, 'mfcc' - takes mfcc feature alone
+    if featuers == 'mfcc':
+        max_acc = np.zeros(3)
+        nCep_max = np.zeros(3)
+        neg_train, neg_test, pos_train, pos_test = read_samples(my_dir)
+        # numCep = np.arange(10,21,1) # Mel Frequency Cepstral Coefficient amount
+        numCep = np.array([20])
+        accList, farList = [], []
+        for n in numCep:  
+            print(f"Eval numcep = {n}")
+            vowels_dataset = get_vowels_dataset(neg_train, neg_test, pos_train, pos_test, numcep=n)
+            acc, far = SVM_test(vowels_dataset)
+            for i in range(len(max_acc)):
+                if acc[i] > max_acc[i]: 
+                    max_acc[i] = acc[i]
+                    nCep_max[i] = n
+            accList.append(acc)
+            farList.append(far)
+        res_acc = np.reshape(accList, (len(numCep),3))
+        res_far = np.reshape(farList, (len(numCep),3))
+        plt_SVM(numCep, res_acc, res_far)
+        print("SVM detection using MFCC feature only")
+        for i,key in enumerate(vowels_dataset.keys()):
+            print(f"Max Accuracy Score of Vowel \'{key}\' is - {np.round((max_acc[i])*100,2)}% with {int(nCep_max[i])} Coefficients" ) 
+        print("low:")
+        test_person('C:/Users/Avinoam/Desktop','/shai_low',vowels_dataset)
+        print("normal:")
+        test_person('C:/Users/Avinoam/Desktop','/shai_normal',vowels_dataset)
+        print("high:")
+        test_person('C:/Users/Avinoam/Desktop','/shai_high',vowels_dataset)
+    elif featuers == 'all':
+        vowels_dataset = test_scalar_features(my_dir)
+        acc, far = SVM_test(vowels_dataset)
+        print("SVM detection using all global scalars features")
+        for i,key in enumerate(vowels_dataset.keys()):
+            print(f"Accuracy Score of Vowel \'{key}\' is - {np.round(acc[i]*100,2)}% with FAR={np.round(far[i]*100,2)}%")

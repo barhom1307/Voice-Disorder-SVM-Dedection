@@ -1,5 +1,5 @@
 # Voice-Disorder-SVM-Dedection
-Partial implementation of the paper - "Learning Strategies for Voice Disorder Detection"
+Partial implementation of the paper - ["Learning Strategies for Voice Disorder Detection"](/LearningStrategiesforVoiceDisorderDetection.pdf)
 
 Project tested on ['Saarbruecken Voice Database'](http://stimmdb.coli.uni-saarland.de/help_en.php4)
 

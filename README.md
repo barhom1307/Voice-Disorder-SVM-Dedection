@@ -18,18 +18,24 @@ Feature based representation with **Mel-frequency cepstral coefficients** (MFCCs
 Each snippet is divided into multiple blocks for a Short-time Fourier transform (STFT) with a block size of 512 and a hop size of 128 samples, respectively. 
 Then, for each block, 20 MFCCs are extracted to form a 20 * 63 input matrix and their mean values and standard deviations over blocks are calculated, resulting in a 40-dimensional feature vector per snippet.
 
+---
+
 **Main Results:**
+
 SVM detection using MFCC feature only-
-Max Accuracy Score of Vowel 'a' is - 69.59% with 12.0 Coefficients
-Max Accuracy Score of Vowel 'i' is - 89.18% with 12.0 Coefficients
-Max Accuracy Score of Vowel 'u' is - 94.43% with 18.0 Coefficients
+
+1. Max Accuracy Score of Vowel 'a' is - 69.59% with 12.0 Coefficients
+2. Max Accuracy Score of Vowel 'i' is - 89.18% with 12.0 Coefficients
+3. Max Accuracy Score of Vowel 'u' is - 94.43% with 18.0 Coefficients
 
 SVM detection using all global scalars features-
-Accuracy Score of Vowel 'a' is - 94.03% with FAR=14.81%
-Accuracy Score of Vowel 'i' is - 81.48% with FAR=33.33%
-Accuracy Score of Vowel 'u' is - 77.78% with FAR=92.59% 
+
+1. Accuracy Score of Vowel 'a' is - 94.03% with FAR=14.81%
+2. Accuracy Score of Vowel 'i' is - 81.48% with FAR=33.33%
+3. Accuracy Score of Vowel 'u' is - 77.78% with FAR=92.59% 
 
 **Global scalars features:**
+
 Central frequency, Central frequency STD, Relative Jitter, Absolute JittSkewness, Relative Average Perturbation, 
 5-point period perturbation quotient (ppq5), Difference of differences of periods (ddp), Relative Shimmer,
 Relative Shimmer dB, Shimmer (apq3), Shimmer (apq5), Shimmer (apq11), Shimmer (dda), 

@@ -115,8 +115,8 @@ def read_samples(my_dir):
     print("Preprocessing positive samples...")
     pos_train = preprocess_wav_files(my_dir + '/train_pos')
     pos_test = preprocess_wav_files(my_dir + '/test_pos')
-    del neg_train['iau'] # deleting unused key - samples of all vowels together ('iau')
-    del neg_test['iau'] # deleting unused key - samples of all vowels together ('iau')
+    # del neg_train['iau'] # deleting unused key - samples of all vowels together ('iau')
+    # del neg_test['iau'] # deleting unused key - samples of all vowels together ('iau')
     return neg_train, neg_test, pos_train, pos_test
     
 def get_vowels_dataset(neg_train, neg_test, pos_train, pos_test, numcep=20):
@@ -225,9 +225,9 @@ def test_person(my_dir, person_dir, vowels_dataset):
 
 def test_scalar_features(my_dir):
     # Please note that dict from "main_get_feature" method is normalized
-    if os.path.exists(my_dir + '/features_dataset.npy'):
+    if os.path.exists(my_dir + '/scalar_features_dataset.npy'):
         print("Loading dataset...")
-        neg_train, neg_test, pos_train, pos_test = np.load(my_dir + '/features_dataset.npy', allow_pickle=True)
+        neg_train, neg_test, pos_train, pos_test = np.load(my_dir + '/scalar_features_dataset.npy', allow_pickle=True)
     else:
         print("Get negative samples features...")
         neg_train = main_get_feature(my_dir + '/train_neg')
@@ -235,7 +235,7 @@ def test_scalar_features(my_dir):
         print("Get positive samples features...")
         pos_train = main_get_feature(my_dir + '/train_pos')
         pos_test = main_get_feature(my_dir + '/test_pos')
-        np.save(my_dir + '/features_dataset.npy', [neg_train, neg_test, pos_train, pos_test])
+        np.save(my_dir + '/scalar_features_dataset.npy', [neg_train, neg_test, pos_train, pos_test])
     vowels_dataset = defaultdict(list)
     print("Building dataset for each vowel...")
     for key in neg_train.keys():
@@ -271,7 +271,12 @@ def test_SVM_with_mfcc(my_dir, kernel):
     max_acc = np.zeros(4)
     nCep_max = np.zeros(4)
     far_max = np.zeros(4)
-    neg_train, neg_test, pos_train, pos_test = read_samples(my_dir)
+    if os.path.exists(my_dir + '/features_dataset.npy'):
+        print("Loading dataset...")
+        neg_train, neg_test, pos_train, pos_test = np.load(my_dir + '/features_dataset.npy', allow_pickle=True)
+    else:
+        neg_train, neg_test, pos_train, pos_test = read_samples(my_dir)
+        np.save(my_dir + '/features_dataset.npy', [neg_train, neg_test, pos_train, pos_test])
     numCep = np.arange(10,21,1) # Mel Frequency Cepstral Coefficient amount
     # numCep = np.array([20])
     accList, farList = [], []
@@ -297,7 +302,7 @@ def test_SVM_with_mfcc(my_dir, kernel):
 
 
 if __name__== '__main__':
-    my_dir = 'C:/Users/Avinoam/Desktop/dataset'
+    my_dir = 'C:/Users/Avinoam/Desktop/Voice-Disorder-SVM-Dedection/dataset'
     featuers = 'mfcc' # 'all'- takes all scalars global featurs, 'mfcc' - takes mfcc feature alone
     kernel = 'linear'
     if featuers == 'mfcc':

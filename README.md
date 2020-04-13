@@ -1,8 +1,9 @@
 # Voice-Disorder-SVM-Dedection
 Partial implementation of the paper - ["Learning Strategies for Voice Disorder Detection"](/LearningStrategiesforVoiceDisorderDetection.pdf)
 
-Project tested on the following DB ['Saarbruecken Voice Database'](http://stimmdb.coli.uni-saarland.de/help_en.php4)
-You could also download processed DB (splitted to train & test sets) from [here](https://www.ynet.co.il/home/0,7340,L-8,00.html)
+Project tested on the following DB ['Saarbruecken Voice Database'](http://stimmdb.coli.uni-saarland.de/help_en.php4).
+
+You could also download processed DB (splitted to train & test sets) from [here](https://www.ynet.co.il/home/0,7340,L-8,00.html).
 
 Please note that while in the original paper voice disorder anomalys were tested also on CNN and AE models, in this specific project i only tested the DB on Linear SVM model.
 

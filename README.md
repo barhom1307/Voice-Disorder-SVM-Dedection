@@ -1,7 +1,7 @@
 # Voice-Disorder-SVM-Dedection
 Partial implementation of the paper - ["Learning Strategies for Voice Disorder Detection"](/LearningStrategiesforVoiceDisorderDetection.pdf)
 
-Project tested on the following DB ['Saarbruecken Voice Database'](http://stimmdb.coli.uni-saarland.de/help_en.php4).
+Project was tested on the following DB ['Saarbruecken Voice Database'](http://stimmdb.coli.uni-saarland.de/help_en.php4), which is a collection of voice recordings consists of 687 healthy persons and 1354 persons with pathology symptoms. Each person's recording contains the vowels [i, a, u] produced at normal, high and low pitch. 
 
 You could also download processed DB (splitted to train & test sets) from [here](https://drive.google.com/open?id=1HeecPwpnreBIEd6eKfhxQe4pn_s8G3ol).
 

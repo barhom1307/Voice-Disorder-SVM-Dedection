@@ -1,7 +1,9 @@
 # Voice-Disorder-SVM-Dedection
 Partial implementation of the paper - ["Learning Strategies for Voice Disorder Detection"](/LearningStrategiesforVoiceDisorderDetection.pdf)
 
-Project tested on ['Saarbruecken Voice Database'](http://stimmdb.coli.uni-saarland.de/help_en.php4)
+Project was tested on the following DB ['Saarbruecken Voice Database'](http://stimmdb.coli.uni-saarland.de/help_en.php4), which is a collection of voice recordings consists of 687 healthy persons and 1354 persons with pathology symptoms. Each person's recording contains the vowels [i, a, u] produced at normal, high and low pitch. 
+
+You could also download processed DB (splitted to train & test sets) from [here](https://drive.google.com/open?id=1HeecPwpnreBIEd6eKfhxQe4pn_s8G3ol).
 
 Please note that while in the original paper voice disorder anomalys were tested also on CNN and AE models, in this specific project i only tested the DB on Linear SVM model.
 
@@ -24,17 +26,17 @@ Then, for each block, 20 MFCCs are extracted to form a 20 * 63 input matrix and 
 
 SVM detection using MFCC feature only, kernel=linear, class_weight='balanced' :
 
-1. Max Balanced Accuracy Score of Vowel 'a' is - 69.25% , with Far = 16.04% and 20 Coefficients
-2. Max Balanced Accuracy Score of Vowel 'i' is - 83.03% , with Far = 24.54% and 12 Coefficients
-3. Max Balanced Accuracy Score of Vowel 'u' is - 91.93% , with Far = 11.42% and 20 Coefficients
-4. Max Balanced Accuracy Score of Vowels 'aiu' is - 79.5% , with Far = 13.06% and 18 Coefficients
+1. Max Balanced Accuracy Score of Vowel 'a' is - 53.7% , with Far = 55.77% and 18 Coefficients
+2. Max Balanced Accuracy Score of Vowel 'i' is - 89.13% , with Far = 1.6% and 18 Coefficients
+3. Max Balanced Accuracy Score of Vowel 'u' is - 95.35% , with Far = 5.37% and 10 Coefficients
+4. Max Balanced Accuracy Score of Vowels 'aiu' is - 88.06% , with Far = 1.07% and 18 Coefficients
 
 
 SVM detection using all global scalars features, kernel=linear :
 
-1. Accuracy Score of Vowel 'a' is - 94.03% with FAR=14.81%
-2. Accuracy Score of Vowel 'i' is - 81.48% with FAR=33.33%
-3. Accuracy Score of Vowel 'u' is - 77.78% with FAR=92.59% 
+1. Accuracy Score of Vowel 'a' is - 94.03% with Far = 14.81%
+2. Accuracy Score of Vowel 'i' is - 81.48% with Far = 33.33%
+3. Accuracy Score of Vowel 'u' is - 77.78% with Far = 92.59% 
 
 **Global scalars features:**
 
@@ -47,10 +49,10 @@ Harmonic noise ratio (HNR), Skewness, Hurst exponent
   
 |          **Kernel Type**          |    Linear    |      Rbf     |     Poly     |    Sigmoid    |
 |:---------------------------------:|:------------:|:------------:|:------------:|:-------------:|
-|             Vowel 'a'             |    68.38%    |    74.71%    |    51.12%    |     72.96%    |
-|             Vowel 'i'             |    82.16%    |    80.72%    |    52.92%    |     79.34%    |
-|             Vowel 'u'             |    91.69%    |    90.08%    |    58.84%    |     85.72%    |
-|            Vowels 'aiu'           |    81.94%    |     81.4%    |    71.27%    |     79.78%    |
+|             Vowel 'a'             |    53.7%    |    74.71%    |    51.12%    |     72.96%    |
+|             Vowel 'i'             |    89.13%    |    80.72%    |    52.92%    |     79.34%    |
+|             Vowel 'u'             |    95.35%    |    90.08%    |    58.84%    |     85.72%    |
+|            Vowels 'aiu'           |    88.06%    |     81.4%    |    71.27%    |     79.78%    |
 
 
 

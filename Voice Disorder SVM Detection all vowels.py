@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Created on Mar 23 2020
 
-@author: Avinoam
+@author: Avinoam Barhom
+
+Terms of use:
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND .
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY.
 """
 
 import numpy as np

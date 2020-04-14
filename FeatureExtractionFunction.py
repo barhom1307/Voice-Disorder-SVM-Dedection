@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Mar 23 11:53:19 2020
+Created on Mar 23 2020
 
 @author: Daniel Teitelman
+
+Terms of use:
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND .
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY.
 """
 
 # %% Requirements

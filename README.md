@@ -32,11 +32,10 @@ SVM detection using MFCC feature only, kernel=linear, class_weight='balanced' :
 4. Max Balanced Accuracy Score of Vowels 'aiu' is - 88.06% , with Far = 1.07% and 18 Coefficients
 
 
-SVM detection using all global scalars features, kernel=linear :
-
-1. Accuracy Score of Vowel 'a' is - 94.03% with Far = 14.81%
-2. Accuracy Score of Vowel 'i' is - 81.48% with Far = 33.33%
-3. Accuracy Score of Vowel 'u' is - 77.78% with Far = 92.59% 
+SVM detection using all global scalars features, kernel='rbf' :
+1. Balanced Accuracy Score of Vowel 'a' is - 59.75% with Far = 4.36%
+2. Balanced Accuracy Score of Vowel 'i' is - 84.14% with Far = 13.8%
+3. Balanced Accuracy Score of Vowel 'u' is - 61.89% with Far = 9.93%
 
 **Global scalars features:**
 
